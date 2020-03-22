@@ -6,14 +6,24 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using CookieDemo.Models.DatabaseContext;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting.Internal;
+using Microsoft.AspNetCore.Hosting.Builder;
 
 namespace CookieDemo
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, WebHostOptions who, IHostingEnvironment ihe, WebHostBuilderContext whbc, IApplicationBuilderFactory iabf , IHttpContextFactory ihcf) 
         {
             Configuration = configuration;
+
+            var _who = who;
+            var _ihe = ihe;
+            var _whbc = whbc;
+            var _iabf = iabf;
+            var _ihcf = ihcf;
         }
 
         public IConfiguration Configuration { get; }
@@ -21,12 +31,18 @@ namespace CookieDemo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ApplicationDbContext>(o => {
+                o.UseSqlServer(Configuration.GetConnectionString("database"));
+            });
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+
+
 
             //This is assuming you prefer jwt as the default, but you wanna register both, using the config settings for each of them
             //        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
