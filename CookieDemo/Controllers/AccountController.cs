@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -19,9 +20,11 @@ namespace CookieDemo.Controllers
         [HttpPost]
         public IActionResult Login(string userName, string password)
         {
-            if(!string.IsNullOrEmpty(userName) && string.IsNullOrEmpty(password))
+            if(string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
-                return RedirectToAction("Login");
+                TempData["danger"] = "Invalid Username or Password!!";
+                return View();
+                //return RedirectToAction("Login");
             }
 
             //Check the user name and password
@@ -34,7 +37,7 @@ namespace CookieDemo.Controllers
                 //Create the identity for the user
                 identity = new ClaimsIdentity(new[] {
                     new Claim(ClaimTypes.Name, userName),
-                    new Claim(ClaimTypes.Role, "Admin")
+                    new Claim(ClaimTypes.Role, "Admin")//you can decide your own claim type
                 }, CookieAuthenticationDefaults.AuthenticationScheme);
 
                 isAuthenticated = true;
@@ -57,6 +60,14 @@ namespace CookieDemo.Controllers
 
                 var login = HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
+                HttpContext.User = principal;
+                Thread.CurrentPrincipal = principal;
+
+                var usr = HttpContext.User;
+                var usrClaims = HttpContext.User.Claims;
+                var usrIdentities = HttpContext.User.Identities;
+                var usrAdminRole = HttpContext.User.IsInRole("Admin");
+
                 return RedirectToAction("Index", "Home");
             }
             return View();
@@ -70,5 +81,3 @@ namespace CookieDemo.Controllers
         }
     }
 }
-
-

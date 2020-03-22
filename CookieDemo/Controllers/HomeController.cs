@@ -5,7 +5,6 @@ using System.Diagnostics;
 
 namespace CookieDemo.Controllers
 {
-
     public class HomeController : Controller
     {
         [Authorize(Roles ="Admin, User")]

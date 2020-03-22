@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +27,11 @@ namespace CookieDemo
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+
+            //This is assuming you prefer jwt as the default, but you wanna register both, using the config settings for each of them
+            //        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => Configuration.Bind("JwtSettings", options))
+            //.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => Configuration.Bind("CookieSettings", options));
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
